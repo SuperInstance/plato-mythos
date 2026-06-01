@@ -45,9 +45,10 @@ class ShellLoRA(nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self):
-        """Initialize A with Kaiming uniform and B with zeros (standard LoRA)."""
+        """Initialize A with Kaiming uniform and B with small per-shell noise."""
         nn.init.kaiming_uniform_(self.lora_A, a=math.sqrt(5))
-        nn.init.zeros_(self.lora_B)
+        # Standard LoRA uses zeros for B, but we need per-shell differentiation
+        nn.init.normal_(self.lora_B, std=0.01)
 
     def forward(self, x: torch.Tensor, shell_id: int) -> torch.Tensor:
         """Apply the shell-specific LoRA residual.
